@@ -3,15 +3,13 @@ package tototoshi.base64
 object Base64 {
   val encodeTable = List('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/');
 
-
   def encode(fromBytes: List[Byte]) :String = {
     val encoded = {
-      get6StrList(fromBytes)
+      get6BitStrList(fromBytes)
       .map(nishin(_))
       .map(encodeChar(_))
       .foldLeft(""){(x,y) => x + y}
     }
-
     encoded.length % 4 match {
       case 0 => encoded
       case x => encoded + "=" * (4 - x)
@@ -20,14 +18,9 @@ object Base64 {
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
-  def nishin(src: String) :Int = {
-    (src.toList.map(_.toInt - 48) zip List(5,4,3,2,1,0))
-    .map(x => x._1 * math.pow(2 , x._2))
-    .map(_.toInt)
-    .foldLeft(0)((x,y) => x + y)
-  }
+  def nishin(src: String) :Int = Integer.parseInt(src, 2)
 
-  def get6StrList(fromBytes: List[Byte]) :List[String] = {
+  def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val src = toBinaryString(fromBytes)
     var store :List[String] = List()
     var offset = 0
@@ -49,21 +42,18 @@ object Base64 {
   }
 
   def toBinaryString(fromBytes: List[Byte]) :String= {
-    val bitCharList: List[String] = get8bitStrList(fromBytes)
-    bitCharList.foldLeft(""){(x,y) => x+y}
+    get8bitStrList(fromBytes)
+    .foldLeft(""){(x,y) => x+y}
   }
 
   def get8bitStrList(fromBytes: List[Byte]) :List[String]= {
-    val bStringList = fromBytes.map(x => (x & 255).toBinaryString)
-    bStringList.map(to8(_))
-  }
-
-  def to8(s: String) :String= {
-    s.length match {
+    fromBytes
+    .map(x => (x & 255).toBinaryString)
+    .map(s => s.length match {
       case 8 => s
       case len if (len > 8) => s.slice(len - 8, len)
       case len if (len < 8) => ("0" * (8 - len)) + s
-    }
+    })
   }
 
 }

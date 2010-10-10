@@ -28,15 +28,15 @@ class HelloSuite extends FunSuite{
     assert(Base64.nishin("110101") == 53)
   }
 
-  test("get6strList"){
+  test("get6BitstrList"){
     val expected = List("010000", "010100", "001001", "000011", "010001",
 			"000100", "010101", "000110", "010001", "110000")
 //    println(expected)
-//    println(Base64.get6StrList("ABCDEFG".getBytes().toList))
-    assert(Base64.get6StrList("ABCDEFG".getBytes().toList) == expected)
+//    println(Base64.get6BitStrList("ABCDEFG".getBytes().toList))
+    assert(Base64.get6BitStrList("ABCDEFG".getBytes().toList) == expected)
   }
 
-  test("ABCDEFG to Integer List"){
+  test("get8bitStrList"){
     val expectedList = {
       "01000001" ::
       "01000010" ::
@@ -47,8 +47,6 @@ class HelloSuite extends FunSuite{
       "01000111" ::
       Nil
     }
-
-//  val expectedList = List("65", "66", "67", "68", "69", "70", "71")
     assert(Base64.get8bitStrList("ABCDEFG".getBytes().toList) == expectedList)
   }
 
@@ -59,11 +57,5 @@ class HelloSuite extends FunSuite{
     assert(Base64.encode("ABCDEFG".getBytes.toList) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes.toList) == "aG9nZXBpeW9mb29iYXI=")
   }
-
-  test("to8"){
-    assert(Base64.to8("10000010001001") == "10001001")
-    assert(Base64.to8("01001") == "00001001")
-  }
-
 
 }
