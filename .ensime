@@ -1,0 +1,15 @@
+;; This config was generated using ensime-config-gen. Feel free to customize its contents manually.
+
+(
+
+:project-name "scala-base64"
+
+:server-root "/home/toshi/.emacs.d/ensime"
+
+:project-package "tototoshi"
+
+:compile-jars ("~/workspace/scala/base64/lib_managed")
+
+:use-sbt t
+
+)
