@@ -3,7 +3,7 @@ package tototoshi.test.base64
 import tototoshi.base64._
 import org.scalatest.FunSuite
 
-class HelloSuite extends FunSuite{
+class testBase64 extends FunSuite{
   test("toBinaryString"){
     val expected = {
       "01000001" +
@@ -23,9 +23,9 @@ class HelloSuite extends FunSuite{
     assert(Base64.encodeChar(53) == '1')
   }
 
-  test("nishin"){
-    println(Base64.nishin("110101"))
-    assert(Base64.nishin("110101") == 53)
+  test("binaryToDecimal"){
+    println(Base64.binaryToDecimal("110101"))
+    assert(Base64.binaryToDecimal("110101") == 53)
   }
 
   test("get6BitstrList"){
@@ -54,6 +54,8 @@ class HelloSuite extends FunSuite{
   test("Encode"){
 //    println(Base64.encode("ABCDEFG".getBytes.toList))
 //    println(Base64.encode("hogepiyofoobar".getBytes.toList))
+    assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
+    assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
     assert(Base64.encode("ABCDEFG".getBytes.toList) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes.toList) == "aG9nZXBpeW9mb29iYXI=")
   }

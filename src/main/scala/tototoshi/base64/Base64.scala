@@ -1,12 +1,26 @@
 package tototoshi.base64
 
 object Base64 {
-  val encodeTable = List('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/');
+  val encodeTable = List('A', 'B', 'C', 'D', 'E', 'F', 'G',
+			 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+			 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+			 'V', 'W', 'X', 'Y', 'Z',
+			 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+			 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+			 'o', 'p', 'q', 'r', 's', 't', 'u',
+			 'v', 'w', 'x', 'y', 'z',
+			 '0', '1', '2', '3', '4', '5', '6',
+			 '7', '8', '9',
+			 '+', '/');
+
+  def encode(fromBytes: Array[Byte]) : String = {
+    encode(fromBytes.toList)
+  }
 
   def encode(fromBytes: List[Byte]) :String = {
     val encoded = {
       get6BitStrList(fromBytes)
-      .map(nishin(_))
+      .map(binaryToDecimal(_))
       .map(encodeChar(_))
       .foldLeft(""){(x,y) => x + y}
     }
@@ -18,23 +32,24 @@ object Base64 {
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
-  def nishin(src: String) :Int = Integer.parseInt(src, 2)
+  def binaryToDecimal(src: String) :Int = Integer.parseInt(src, 2)
 
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
+    val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
     var store :List[String] = List()
     var offset = 0
-    def limit = offset + 6
+    def limit = offset + BIT_LENGTH
 
     while(limit < src.length()){
       store = src.slice(offset, limit) :: store
-      offset += 6
+      offset += BIT_LENGTH
     }
 
     var tail = src.slice(offset, limit)
     tail = tail.length match {
-      case 6 => tail
-      case len if (len < 6) => tail + "0" * (6- tail.length())
+      case BIT_LENGTH => tail
+      case len if (len < BIT_LENGTH) => tail + "0" * (BIT_LENGTH - tail.length())
     }
 
     store = tail :: store
@@ -47,12 +62,13 @@ object Base64 {
   }
 
   def get8bitStrList(fromBytes: List[Byte]) :List[String]= {
+    val BIT_LENGTH = 8
     fromBytes
     .map(x => (x & 255).toBinaryString)
     .map(s => s.length match {
-      case 8 => s
-      case len if (len > 8) => s.slice(len - 8, len)
-      case len if (len < 8) => ("0" * (8 - len)) + s
+      case BIT_LENGTH => s
+      case len if (len > BIT_LENGTH) => s.slice(len - BIT_LENGTH, len)
+      case len if (len < BIT_LENGTH) => ("0" * (BIT_LENGTH - len)) + s
     })
   }
 
