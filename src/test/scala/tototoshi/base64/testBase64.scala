@@ -33,6 +33,12 @@ class testBase64 extends FunSuite{
     assert(Base64.get6BitStrList("ABCDEFG".getBytes().toList) == expected)
   }
 
+  test("concatAll"){
+    val src = "a" :: "b" :: "c" :: Nil
+    val expected = "abc"
+    assert(Base64.concatAll(src) == expected)
+  }
+
   test("Encode"){
     assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
@@ -46,18 +52,12 @@ class testBase64 extends FunSuite{
     assert(Base64.deleteEqual(src) == expected)
   }
 
-  test("indexOf"){
-    val src = 'g'
-    val expected = 32
-    assert(Base64.indexOf(src) == expected)
-  }
-
-  test("getIndexList"){
+  test("getEncodeTableIndexList"){
     val src = "QUJD"
     val srcWithEqual = "QUJD=="
     val expected = 16 :: 20 :: 9 :: 3 :: Nil
-    assert(Base64.getIndexList(src) == expected)
-    assert(Base64.getIndexList(srcWithEqual) == expected)
+    assert(Base64.getEncodeTableIndexList(src) == expected)
+    assert(Base64.getEncodeTableIndexList(srcWithEqual) == expected)
   }
 
   test("convertIntTo6bitString"){

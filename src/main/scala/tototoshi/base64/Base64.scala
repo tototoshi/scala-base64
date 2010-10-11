@@ -1,3 +1,5 @@
+//http://ja.wikipedia.org/wiki/Base64
+
 package tototoshi.base64
 
 object Base64 {
@@ -32,6 +34,8 @@ object Base64 {
 
   def binaryToDecimal(src: String) :Int = Integer.parseInt(src, 2)
 
+  def concatAll(strList: List[String]) :String = strList.foldLeft(""){_+_}
+
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
@@ -40,8 +44,10 @@ object Base64 {
 
   def toBinaryString(fromBytes: List[Byte]) :String = {
     val BIT_LENGTH = 8
+    val MASK = binaryToDecimal("11111111")
+
     fromBytes
-    .map(x => (x & 255).toBinaryString)
+    .map(x => (x & MASK).toBinaryString)
     .map(s => s.length match {
       case BIT_LENGTH => s
       case len if (len > BIT_LENGTH) => s.slice(len - BIT_LENGTH, len)
@@ -52,12 +58,10 @@ object Base64 {
 
   def deleteEqual(src: String) :String = src.filter(_ != '=')
 
-  def indexOf(c: Char) :Int = encodeTable.indexOf(c)
-
-  def getIndexList(s: String): List[Int]= {
+  def getEncodeTableIndexList(s: String): List[Int]= {
     deleteEqual(s)
     .toList
-    .map(x => indexOf(x))
+    .map(x => encodeTable.indexOf(x))
   }
 
   def convertIntTo6bitString(i: Int) :String = {
@@ -71,12 +75,17 @@ object Base64 {
 
   def decode(src: String) :String = {
     val BIT_LENGTH = 8
-    val res = getIndexList(src)
-    .map(x => convertIntTo6bitString(x))
+
+    val indexArray = {
+      getEncodeTableIndexList(src)
+      .map(x => convertIntTo6bitString(x))
+    }
+
+    val binaryStringArray: String = deleteExtraZero(indexArray.foldLeft(""){_+_})
+
+    takeEach(BIT_LENGTH, binaryStringArray)
+    .map(x => binaryToDecimal(x).toChar)
     .foldLeft(""){_+_}
-    val res2 = deleteExtraZero(res)
-    val res3 = takeEach(BIT_LENGTH, res2)
-    res3.map(x => Integer.parseInt(x, 2).toChar).foldLeft(""){_+_}
   }
 
   def deleteExtraZero(s: String): String = {
