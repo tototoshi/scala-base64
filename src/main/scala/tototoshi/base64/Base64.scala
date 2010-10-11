@@ -13,16 +13,14 @@ object Base64 {
 			 '7', '8', '9',
 			 '+', '/');
 
-  def encode(fromBytes: Array[Byte]) : String = {
-    encode(fromBytes.toList)
-  }
+  def encode(fromBytes: Array[Byte]) : String = encode(fromBytes.toList)
 
   def encode(fromBytes: List[Byte]) :String = {
     val encoded = {
       get6BitStrList(fromBytes)
       .map(binaryToDecimal(_))
       .map(encodeChar(_))
-      .foldLeft(""){(x,y) => x + y}
+      .foldLeft(""){_+_}
     }
     encoded.length % 4 match {
       case 0 => encoded
@@ -37,31 +35,10 @@ object Base64 {
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
-    var store :List[String] = List()
-    var offset = 0
-    def limit = offset + BIT_LENGTH
-
-    while(limit < src.length()){
-      store = src.slice(offset, limit) :: store
-      offset += BIT_LENGTH
-    }
-
-    var tail = src.slice(offset, limit)
-    tail = tail.length match {
-      case BIT_LENGTH => tail
-      case len if (len < BIT_LENGTH) => tail + "0" * (BIT_LENGTH - tail.length())
-    }
-
-    store = tail :: store
-    store.reverse
+    takeEach(BIT_LENGTH, src)
   }
 
-  def toBinaryString(fromBytes: List[Byte]) :String= {
-    get8bitStrList(fromBytes)
-    .foldLeft(""){(x,y) => x+y}
-  }
-
-  def get8bitStrList(fromBytes: List[Byte]) :List[String]= {
+  def toBinaryString(fromBytes: List[Byte]) :String = {
     val BIT_LENGTH = 8
     fromBytes
     .map(x => (x & 255).toBinaryString)
@@ -70,6 +47,63 @@ object Base64 {
       case len if (len > BIT_LENGTH) => s.slice(len - BIT_LENGTH, len)
       case len if (len < BIT_LENGTH) => ("0" * (BIT_LENGTH - len)) + s
     })
+    .foldLeft(""){ _+_}
+  }
+
+  def deleteEqual(src: String) :String = src.filter(_ != '=')
+
+  def indexOf(c: Char) :Int = encodeTable.indexOf(c)
+
+  def getIndexList(s: String): List[Int]= {
+    deleteEqual(s)
+    .toList
+    .map(x => indexOf(x))
+  }
+
+  def convertIntTo6bitString(i: Int) :String = {
+    val BIT_LENGTH = 6
+    val result = i.toBinaryString
+    result.length match {
+      case BIT_LENGTH => result
+      case len if (len < BIT_LENGTH) => ("0" * (BIT_LENGTH - len)) + result
+    }
+  }
+
+  def decode(src: String) :String = {
+    val BIT_LENGTH = 8
+    val res = getIndexList(src)
+    .map(x => convertIntTo6bitString(x))
+    .foldLeft(""){_+_}
+    val res2 = deleteExtraZero(res)
+    val res3 = takeEach(BIT_LENGTH, res2)
+    res3.map(x => Integer.parseInt(x, 2).toChar).foldLeft(""){_+_}
+  }
+
+  def deleteExtraZero(s: String): String = {
+    val BIT_LENGTH = 8
+    val len = s.length
+    s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
+  }
+
+  def takeEach(i: Int, src: String): List[String] = {
+    val BIT_LENGTH = i
+    var store :List[String] = List()
+    var offset = 0
+    def limit = offset + BIT_LENGTH
+
+    while(limit < src.size){
+      store = src.slice(offset, limit) :: store
+      offset += BIT_LENGTH
+    }
+
+    var tail = src.slice(offset, limit)
+    tail = tail.length match {
+      case BIT_LENGTH => tail
+      case len if (len < BIT_LENGTH) => tail + "0" * (BIT_LENGTH - tail.size)
+    }
+
+    store = tail :: store
+    store.reverse
   }
 
 }

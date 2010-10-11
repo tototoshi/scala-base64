@@ -24,40 +24,56 @@ class testBase64 extends FunSuite{
   }
 
   test("binaryToDecimal"){
-    println(Base64.binaryToDecimal("110101"))
     assert(Base64.binaryToDecimal("110101") == 53)
   }
 
   test("get6BitstrList"){
     val expected = List("010000", "010100", "001001", "000011", "010001",
 			"000100", "010101", "000110", "010001", "110000")
-//    println(expected)
-//    println(Base64.get6BitStrList("ABCDEFG".getBytes().toList))
     assert(Base64.get6BitStrList("ABCDEFG".getBytes().toList) == expected)
   }
 
-  test("get8bitStrList"){
-    val expectedList = {
-      "01000001" ::
-      "01000010" ::
-      "01000011" ::
-      "01000100" ::
-      "01000101" ::
-      "01000110" ::
-      "01000111" ::
-      Nil
-    }
-    assert(Base64.get8bitStrList("ABCDEFG".getBytes().toList) == expectedList)
-  }
-
-
   test("Encode"){
-//    println(Base64.encode("ABCDEFG".getBytes.toList))
-//    println(Base64.encode("hogepiyofoobar".getBytes.toList))
     assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
     assert(Base64.encode("ABCDEFG".getBytes.toList) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes.toList) == "aG9nZXBpeW9mb29iYXI=")
   }
+
+  test("deleteEqual"){
+    val src = "abcdefg==="
+    val expected = "abcdefg"
+    assert(Base64.deleteEqual(src) == expected)
+  }
+
+  test("indexOf"){
+    val src = 'g'
+    val expected = 32
+    assert(Base64.indexOf(src) == expected)
+  }
+
+  test("getIndexList"){
+    val src = "QUJD"
+    val srcWithEqual = "QUJD=="
+    val expected = 16 :: 20 :: 9 :: 3 :: Nil
+    assert(Base64.getIndexList(src) == expected)
+    assert(Base64.getIndexList(srcWithEqual) == expected)
+  }
+
+  test("convertIntTo6bitString"){
+    val src = 43
+    val expected = "101011"
+    assert(Base64.convertIntTo6bitString(src) == expected)
+  }
+
+  test("decode"){
+    val src = "QUJDREVGRw=="
+    val src2 = "aG9nZXBpeW9mb29iYXI="
+    val expected = "ABCDEFG"
+    val expected2 = "hogepiyofoobar"
+    assert(Base64.decode(src) == expected)
+    assert(Base64.decode(src2) == expected2)
+  }
+
 
 }
