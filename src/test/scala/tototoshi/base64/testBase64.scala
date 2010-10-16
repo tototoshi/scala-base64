@@ -33,12 +33,6 @@ class testBase64 extends FunSuite{
     assert(Base64.get6BitStrList("ABCDEFG".getBytes().toList) == expected)
   }
 
-  test("concatAll"){
-    val src = "a" :: "b" :: "c" :: Nil
-    val expected = "abc"
-    assert(Base64.concatAll(src) == expected)
-  }
-
   test("Encode"){
     assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")

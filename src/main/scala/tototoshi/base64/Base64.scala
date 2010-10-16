@@ -22,8 +22,9 @@ object Base64 {
       get6BitStrList(fromBytes)
       .map(binaryToDecimal(_))
       .map(encodeChar(_))
-      .foldLeft(""){_+_}
+      .mkString
     }
+
     encoded.length % 4 match {
       case 0 => encoded
       case x => encoded + "=" * (4 - x)
@@ -33,8 +34,6 @@ object Base64 {
   def encodeChar(i: Int) :Char = encodeTable(i)
 
   def binaryToDecimal(src: String) :Int = Integer.parseInt(src, 2)
-
-  def concatAll(strList: List[String]) :String = strList.foldLeft(""){_+_}
 
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
@@ -53,7 +52,7 @@ object Base64 {
       case len if (len > BIT_LENGTH) => s.slice(len - BIT_LENGTH, len)
       case len if (len < BIT_LENGTH) => ("0" * (BIT_LENGTH - len)) + s
     })
-    .foldLeft(""){ _+_}
+    .mkString
   }
 
   def deleteEqual(src: String) :String = src.filter(_ != '=')
@@ -81,11 +80,11 @@ object Base64 {
       .map(x => convertIntTo6bitString(x))
     }
 
-    val binaryStringArray: String = deleteExtraZero(indexArray.foldLeft(""){_+_})
+    val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
     takeEach(BIT_LENGTH, binaryStringArray)
     .map(x => binaryToDecimal(x).toChar)
-    .foldLeft(""){_+_}
+    .mkString
   }
 
   def deleteExtraZero(s: String): String = {
