@@ -1,19 +1,9 @@
-//http://ja.wikipedia.org/wiki/Base64
-
 package jp.ddo.ttoshi.base64
 
+import scala.annotation.tailrec
+
 object Base64 {
-  val encodeTable = List('A', 'B', 'C', 'D', 'E', 'F', 'G',
-			 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-			 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-			 'V', 'W', 'X', 'Y', 'Z',
-			 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-			 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-			 'o', 'p', 'q', 'r', 's', 't', 'u',
-			 'v', 'w', 'x', 'y', 'z',
-			 '0', '1', '2', '3', '4', '5', '6',
-			 '7', '8', '9',
-			 '+', '/');
+  val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
   def encode(fromBytes: Array[Byte]) : String = encode(fromBytes.toList)
 
@@ -38,7 +28,12 @@ object Base64 {
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
-    takeEach(BIT_LENGTH, src)
+    splitEachN[Char](src.toList, BIT_LENGTH)
+    .map(x =>
+      x.length match {
+        case BIT_LENGTH => x.mkString
+        case l => x.mkString + "0" * (BIT_LENGTH - l)
+      })
   }
 
   def toBinaryString(fromBytes: List[Byte]) :String = {
@@ -59,8 +54,8 @@ object Base64 {
 
   def getEncodeTableIndexList(s: String): List[Int]= {
     deleteEqual(s)
-    .toList
     .map(x => encodeTable.indexOf(x))
+    .toList
   }
 
   def convertIntTo6bitString(i: Int) :String = {
@@ -79,10 +74,14 @@ object Base64 {
       getEncodeTableIndexList(src)
       .map(x => convertIntTo6bitString(x))
     }
-
     val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
-    takeEach(BIT_LENGTH, binaryStringArray)
+    splitEachN[Char](binaryStringArray.toList, BIT_LENGTH)
+    .map(x =>
+      x.length match {
+        case 6 => x.mkString
+        case l => x.mkString + "0" * (6 - l)
+      })
     .map(x => binaryToDecimal(x).toChar)
     .mkString
   }
@@ -93,25 +92,11 @@ object Base64 {
     s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
   }
 
-  def takeEach(i: Int, src: String): List[String] = {
-    val BIT_LENGTH = i
-    var store :List[String] = List()
-    var offset = 0
-    def limit = offset + BIT_LENGTH
-
-    while(limit < src.size){
-      store = src.slice(offset, limit) :: store
-      offset += BIT_LENGTH
+  @tailrec
+  def splitEachN[A](xs: List[A], n: Int, res: List[List[A]] = List()) :List[List[A]]= {
+    xs match {
+      case List() => res
+      case xs => splitEachN[A](xs.drop(n), n, res :+ xs.take(n))
     }
-
-    var tail = src.slice(offset, limit)
-    tail = tail.length match {
-      case BIT_LENGTH => tail
-      case len if (len < BIT_LENGTH) => tail + "0" * (BIT_LENGTH - tail.size)
-    }
-
-    store = tail :: store
-    store.reverse
   }
-
 }

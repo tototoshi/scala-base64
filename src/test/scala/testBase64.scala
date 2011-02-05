@@ -1,6 +1,6 @@
-package tototoshi.test.base64
+package jp.ddo.ttoshi.test.base64
 
-import tototoshi.base64._
+import jp.ddo.ttoshi.base64._
 import org.scalatest.FunSuite
 
 class testBase64 extends FunSuite{
@@ -69,5 +69,9 @@ class testBase64 extends FunSuite{
     assert(Base64.decode(src2) == expected2)
   }
 
-
+  test("splitEachN") {
+    val from = "abcdefghij".toList
+    val to   = List(List('a', 'b'), List('c', 'd'), List('e', 'f'), List('g', 'h'), List('i', 'j'))
+    assert(Base64.splitEachN[Char](from, 2) == to)
+  }
 }

@@ -6,7 +6,7 @@
 
 :server-root "/home/toshi/.emacs.d/ensime"
 
-:project-package "tototoshi"
+:project-package "jp.ddo.ttoshi.base64"
 
 :compile-jars ("~/workspace/scala/base64/lib_managed")
 
