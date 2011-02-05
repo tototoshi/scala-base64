@@ -1,6 +1,6 @@
 //http://ja.wikipedia.org/wiki/Base64
 
-package tototoshi.base64
+package jp.ddo.ttoshi.base64
 
 object Base64 {
   val encodeTable = List('A', 'B', 'C', 'D', 'E', 'F', 'G',
