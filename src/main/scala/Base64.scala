@@ -28,7 +28,7 @@ object Base64 {
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
-    splitEachN[Char](src.toList, BIT_LENGTH)
+    splitEveryN[Char](src.toList, BIT_LENGTH)
     .map(x =>
       x.length match {
         case BIT_LENGTH => x.mkString
@@ -76,7 +76,7 @@ object Base64 {
     }
     val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
-    splitEachN[Char](binaryStringArray.toList, BIT_LENGTH)
+    splitEveryN[Char](binaryStringArray.toList, BIT_LENGTH)
     .map(x =>
       x.length match {
         case 6 => x.mkString
@@ -93,10 +93,10 @@ object Base64 {
   }
 
   @tailrec
-  def splitEachN[A](xs: List[A], n: Int, res: List[List[A]] = List()) :List[List[A]]= {
+  def splitEveryN[A](xs: List[A], n: Int, res: List[List[A]] = List()) :List[List[A]]= {
     xs match {
       case List() => res
-      case xs => splitEachN[A](xs.drop(n), n, res :+ xs.take(n))
+      case xs => splitEveryN[A](xs.drop(n), n, res :+ xs.take(n))
     }
   }
 }
