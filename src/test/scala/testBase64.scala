@@ -23,8 +23,8 @@ class testBase64 extends FunSuite{
     assert(Base64.encodeChar(53) == '1')
   }
 
-  test("binaryToDecimal"){
-    assert(Base64.binaryToDecimal("110101") == 53)
+  test("binaryStringToDecimal"){
+    assert(Base64.binaryStringToDecimal("110101") == 53)
   }
 
   test("get6BitstrList"){
@@ -81,6 +81,15 @@ class testBase64 extends FunSuite{
     assert(List(1, 2, 3) == Base64.trim[Int](a, 3, 0))
     assert(List(1, 2, 3) == Base64.trim[Int](b, 3, 0))
     assert(List(1, 2, 0) == Base64.trim[Int](c, 3, 0))
+  }
+
+  test("trimString") {
+    val a = "abc"
+    val b = "abcdefgo"
+    val c = "a"
+    assert("abc" == Base64.trimString(a, 3, '0'))
+    assert("abc" == Base64.trimString(b, 3, '0'))
+    assert("a00" == Base64.trimString(c, 3, '0'))
   }
 
 }

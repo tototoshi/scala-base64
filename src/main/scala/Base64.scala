@@ -10,11 +10,9 @@ object Base64 {
   def encode(fromBytes: List[Byte]) :String = {
     val encoded = {
       get6BitStrList(fromBytes)
-      .map(binaryToDecimal(_))
-      .map(encodeChar(_))
+      .map(x => encodeChar(binaryStringToDecimal(x)))
       .mkString
     }
-
     encoded.length % 4 match {
       case 0 => encoded
       case x => encoded + "=" * (4 - x)
@@ -23,7 +21,7 @@ object Base64 {
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
-  def binaryToDecimal(src: String) :Int = Integer.parseInt(src, 2)
+  def binaryStringToDecimal(src: String) :Int = Integer.parseInt(src, 2)
 
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
@@ -34,7 +32,7 @@ object Base64 {
 
   def toBinaryString(fromBytes: List[Byte]) :String = {
     val BIT_LENGTH = 8
-    val MASK = binaryToDecimal("11111111")
+    val MASK = binaryStringToDecimal("11111111")
 
     fromBytes
     .map(x => (x & MASK).toBinaryString)
@@ -59,7 +57,7 @@ object Base64 {
     val result = i.toBinaryString
     result.length match {
       case BIT_LENGTH => result
-      case len if (len < BIT_LENGTH) => ("0" * (BIT_LENGTH - len)) + result
+      case len if len < BIT_LENGTH => ("0" * (BIT_LENGTH - len)) + result
     }
   }
 
@@ -72,14 +70,14 @@ object Base64 {
     }
     val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
-    binaryStringArray.toList
-    .sliding(BIT_LENGTH, BIT_LENGTH).toList.map(_.mkString)
+    binaryStringArray
+    .sliding(BIT_LENGTH, BIT_LENGTH)
     .map(x =>
       x.length match {
         case 6 => x
         case l => x + "0" * (6 - l)
       })
-    .map(x => binaryToDecimal(x).toChar)
+    .map(binaryStringToDecimal(_).toChar)
     .mkString
   }
 
@@ -98,5 +96,6 @@ object Base64 {
   }
 
   def trimList[A](xss: List[List[A]], n: Int, c: A) :List[List[A]] = xss.map(xs => trim[A](xs, n, c))
+  def trimString(s: String, n: Int, c: Char): String = trim[Char](s.toList, n, c).mkString
 }
 
