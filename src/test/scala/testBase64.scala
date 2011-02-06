@@ -69,4 +69,18 @@ class testBase64 extends FunSuite{
     assert(Base64.decode(src2) == expected2)
   }
 
+  test("trimList") {
+    val a = List(List(1, 2, 3), List(1, 2, 3, 4), List(1, 2))
+    assert(List(List(1, 2, 3), List(1, 2, 3), List(1, 2, 0)) == Base64.trimList[Int](a, 3, 0))
+  }
+
+  test("trim") {
+    val a = List(1, 2, 3)
+    val b = List(1, 2, 3, 4)
+    val c = List(1, 2)
+    assert(List(1, 2, 3) == Base64.trim[Int](a, 3, 0))
+    assert(List(1, 2, 3) == Base64.trim[Int](b, 3, 0))
+    assert(List(1, 2, 0) == Base64.trim[Int](c, 3, 0))
+  }
+
 }

@@ -28,13 +28,8 @@ object Base64 {
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
-    src.toList.sliding(BIT_LENGTH, BIT_LENGTH)
-    .toList
-    .map(x =>
-      x.length match {
-        case BIT_LENGTH => x.mkString
-        case l => x.mkString + "0" * (BIT_LENGTH - l)
-      })
+    trimList[Char](src.toList.sliding(BIT_LENGTH, BIT_LENGTH).toList, BIT_LENGTH, '0')
+    .map(_.mkString)
   }
 
   def toBinaryString(fromBytes: List[Byte]) :String = {
@@ -78,11 +73,11 @@ object Base64 {
     val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
     binaryStringArray.toList
-    .sliding(BIT_LENGTH, BIT_LENGTH).toList
+    .sliding(BIT_LENGTH, BIT_LENGTH).toList.map(_.mkString)
     .map(x =>
       x.length match {
-        case 6 => x.mkString
-        case l => x.mkString + "0" * (6 - l)
+        case 6 => x
+        case l => x + "0" * (6 - l)
       })
     .map(x => binaryToDecimal(x).toChar)
     .mkString
@@ -94,4 +89,14 @@ object Base64 {
     s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
   }
 
+  def trim[A](xs: List[A], n: Int, c: A): List[A] = {
+    xs.length match {
+      case l if l == n => xs
+      case l if l < n  => xs ::: List.fill(n - l)(c)
+      case l if l > n  => xs.take(n)
+    }
+  }
+
+  def trimList[A](xss: List[List[A]], n: Int, c: A) :List[List[A]] = xss.map(xs => trim[A](xs, n, c))
 }
+
