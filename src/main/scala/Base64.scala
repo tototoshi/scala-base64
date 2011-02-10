@@ -1,4 +1,4 @@
-package jp.ddo.ttoshi.base64
+package com.tototoshi.base64
 
 import scala.annotation.tailrec
 
