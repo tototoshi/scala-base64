@@ -5,39 +5,44 @@ import scala.annotation.tailrec
 object Base64 {
   val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-  def encode(fromBytes: Array[Byte]) : String = encode(fromBytes.toList)
-
-  def encode(fromBytes: List[Byte]) :String = {
+  def encode(fromBytes: Array[Byte]) : String = {
     val encoded = {
-      get6BitStrList(fromBytes)
-      .map(x => encodeChar(binaryStringToDecimal(x)))
+      group6Bits(fromBytes)
+      .map(x => encodeChar(binaryToDecimal(x.toArray)))
       .mkString
     }
-    encoded + "=" * ((4 - encoded.length % 4) % 4)
+    encoded + "=" * ((4 - encoded.length % 4) % 4) grouped(76) mkString "\n"
   }
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
   def binaryStringToDecimal(src: String) :Int = Integer.parseInt(src, 2)
 
-  def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
-    val BIT_LENGTH = 6
-    val src = toBinaryString(fromBytes)
-    trimList[Char](src.toList.grouped(BIT_LENGTH).toList, BIT_LENGTH, '0')
-    .map(_.mkString)
+  def binaryToDecimal(ba: Array[Int]): Int = {
+    val len = ba.length
+    var sum = 0
+    var i = 0
+    while (i < len) {
+      sum += ba(len - i - 1) * math.pow(2, i).toInt
+      i += 1
+    }
+    sum
   }
 
-  def toBinaryString(fromBytes: List[Byte]) :String = {
-    val BIT_LENGTH = 8
-    val MASK = binaryStringToDecimal("11111111")
+  def group6Bits(fromBytes: Array[Byte]) :List[List[Int]] = {
+    val BIT_LENGTH = 6
+    val src = toBinaryArray(8)(fromBytes)
+    trimList[Int](src.toList.grouped(BIT_LENGTH).toList, BIT_LENGTH, 0)
+  }
 
-    fromBytes
-    .map(x => (x & MASK).toBinaryString)
-    .map(s => s.length match {
-      case len if len > BIT_LENGTH => s.slice(len - BIT_LENGTH, len)
-      case len => ("0" * (BIT_LENGTH - len)) + s
-    })
-    .mkString
+  def toBinaryArray(bitLength: Int)(from: Array[Byte]): Array[Int] = {
+    val ba = new Array[Int](bitLength * from.length)
+    var i = 0
+    while (i < bitLength * from.length) {
+      ba((i / bitLength) * bitLength + bitLength - (i % 8) - 1) = from(i / bitLength) >> (i % bitLength) & 1
+      i += 1
+    }
+    ba
   }
 
   def deleteEqual(src: String) :String = src.filter(_ != '=')
@@ -86,4 +91,3 @@ object Base64 {
 
   def trimList[A](xss: List[List[A]], n: Int, c: A) :List[List[A]] = xss.map(xs => trim[A](xs, n, c))
 }
-

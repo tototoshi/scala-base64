@@ -1,23 +1,11 @@
 package com.tototoshi.test.base64
 
-import com.tototoshi.base64._
+import com.tototoshi.base64.Base64
 import org.scalatest.FunSuite
+import org.apache.commons.io.FileUtils
+import java.io.File
 
 class testBase64 extends FunSuite{
-  test("toBinaryString"){
-    val expected = {
-      "01000001" +
-      "01000010" +
-      "01000011" +
-      "01000100" +
-      "01000101" +
-      "01000110" +
-      "01000111"
-    }
-
-    assert(Base64.toBinaryString("ABCDEFG".getBytes().toList) == expected)
-  }
-
   test("EncodeTable"){
     assert(Base64.encodeChar(0) == 'A')
     assert(Base64.encodeChar(53) == '1')
@@ -27,18 +15,29 @@ class testBase64 extends FunSuite{
     assert(Base64.binaryStringToDecimal("110101") == 53)
   }
 
-  test("get6BitstrList"){
-    val expected = List("010000", "010100", "001001", "000011", "010001",
-			"000100", "010101", "000110", "010001", "110000")
-    assert(Base64.get6BitStrList("ABCDEFG".getBytes().toList) == expected)
+  test("toBinaryArray") {
+    assert(Base64.toBinaryArray(8)("ABCDEFG" getBytes).toList.mkString == "01000001010000100100001101000100010001010100011001000111")
+  }
+
+  test("binaryToDecimal") {
+    val binary = List(1, 1, 1, 1).toArray
+    val decimal = 15
+    assert(Base64.binaryToDecimal(binary) === decimal)
   }
 
   test("Encode"){
     assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
-    assert(Base64.encode("ABCDEFG".getBytes.toList) == "QUJDREVGRw==")
-    assert(Base64.encode("hogepiyofoobar".getBytes.toList) == "aG9nZXBpeW9mb29iYXI=")
-    assert(Base64.encode("homuho".getBytes.toList) == "aG9tdWhv")
+    assert(Base64.encode("ABCDEFG".getBytes) == "QUJDREVGRw==")
+    assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
+    assert(Base64.encode("homuho".getBytes) == "aG9tdWhv")
+
+    val pixel: Array[Byte] = FileUtils.readFileToByteArray(new File(getClass.getResource("/pixel.gif").getPath))
+    assert(Base64.encode(pixel) == "R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==")
+
+    val scalachan: Array[Byte] = FileUtils.readFileToByteArray(new File(getClass.getResource("/scala-chan.jpg").getPath))
+    val scalachanExpected: String = FileUtils.readFileToString(new File(getClass.getResource("/scala-chan.expected").getPath))
+    assert(Base64.encode(scalachan) == scalachanExpected.trim)
   }
 
   test("deleteEqual"){
