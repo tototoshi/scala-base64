@@ -1,7 +1,5 @@
 package com.tototoshi.base64
 
-import scala.annotation.tailrec
-
 object Base64 {
   val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
