@@ -23,7 +23,7 @@ object Base64 {
   def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
     val BIT_LENGTH = 6
     val src = toBinaryString(fromBytes)
-    trimList[Char](src.toList.sliding(BIT_LENGTH, BIT_LENGTH).toList, BIT_LENGTH, '0')
+    trimList[Char](src.toList.grouped(BIT_LENGTH).toList, BIT_LENGTH, '0')
     .map(_.mkString)
   }
 
@@ -64,7 +64,7 @@ object Base64 {
     val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
 
     binaryStringArray
-    .sliding(BIT_LENGTH, BIT_LENGTH)
+    .grouped(BIT_LENGTH)
     .map(x => x + "0" * (6 - x.length))
     .map(binaryStringToDecimal(_).toChar)
     .mkString

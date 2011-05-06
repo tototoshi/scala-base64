@@ -1,6 +1,6 @@
-package jp.ddo.ttoshi.test.base64
+package com.tototoshi.test.base64
 
-import jp.ddo.ttoshi.base64._
+import com.tototoshi.base64._
 import org.scalatest.FunSuite
 
 class testBase64 extends FunSuite{
