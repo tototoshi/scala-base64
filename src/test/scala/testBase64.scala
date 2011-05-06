@@ -11,10 +11,6 @@ class testBase64 extends FunSuite{
     assert(Base64.encodeChar(53) == '1')
   }
 
-  test("binaryStringToDecimal"){
-    assert(Base64.binaryStringToDecimal("110101") == 53)
-  }
-
   test("toBinaryArray") {
     assert(Base64.toBinaryArray(8)("ABCDEFG" getBytes).toList.mkString == "01000001010000100100001101000100010001010100011001000111")
   }
@@ -54,19 +50,17 @@ class testBase64 extends FunSuite{
     assert(Base64.getEncodeTableIndexList(srcWithEqual) == expected)
   }
 
-  test("convertIntTo6bitString"){
-    val src = 43
-    val expected = "101011"
-    assert(Base64.convertIntTo6bitString(src) == expected)
-  }
-
   test("decode"){
     val src = "QUJDREVGRw=="
     val src2 = "aG9nZXBpeW9mb29iYXI="
-    val expected = "ABCDEFG"
-    val expected2 = "hogepiyofoobar"
-    assert(Base64.decode(src) == expected)
-    assert(Base64.decode(src2) == expected2)
+    val expected = "ABCDEFG".getBytes
+    val expected2 = "hogepiyofoobar".getBytes
+    assert(Base64.decode(src2).toList == expected2.toList)
+    assert(Base64.decode(src).toList == expected.toList)
+
+    val scalachan: Array[Byte] = FileUtils.readFileToByteArray(new File(getClass.getResource("/scala-chan.jpg").getPath))
+    val scalachan64: String = FileUtils.readFileToString(new File(getClass.getResource("/scala-chan.expected").getPath))
+    assert(Base64.decode(scalachan64.trim).toList == scalachan.toList)
   }
 
   test("trimList") {

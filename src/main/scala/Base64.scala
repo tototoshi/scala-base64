@@ -16,8 +16,6 @@ object Base64 {
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
-  def binaryStringToDecimal(src: String) :Int = Integer.parseInt(src, 2)
-
   def binaryToDecimal(ba: Array[Int]): Int = {
     val len = ba.length
     var sum = 0
@@ -36,7 +34,7 @@ object Base64 {
   }
 
   def toBinaryArray(bitLength: Int)(from: Array[Byte]): Array[Int] = {
-    val ba = new Array[Int](bitLength * from.length)
+    val ba = Array.fill(bitLength * from.length)(0)
     var i = 0
     while (i < bitLength * from.length) {
       ba((i / bitLength) * bitLength + bitLength - (i % 8) - 1) = from(i / bitLength) >> (i % bitLength) & 1
@@ -53,29 +51,21 @@ object Base64 {
     .toList
   }
 
-  def convertIntTo6bitString(i: Int) :String = {
-    val BIT_LENGTH = 6
-    val result = i.toBinaryString
-    "0" * (BIT_LENGTH - result.length) + result
-  }
-
-  def decode(src: String) :String = {
+  def decode(src: String) :Array[Byte] = {
     val BIT_LENGTH = 8
 
     val indexArray = {
-      getEncodeTableIndexList(src)
-      .map(x => convertIntTo6bitString(x))
+      getEncodeTableIndexList(src.filterNot(_ == '\n'))
+      .map(x => toBinaryArray(6)(Array.fill(1)(x.toByte)))
     }
-    val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
+    val binaryArray: Array[Int] = deleteExtraZero(indexArray.flatMap(s => s).toArray)
 
-    binaryStringArray
+    binaryArray
     .grouped(BIT_LENGTH)
-    .map(x => x + "0" * (6 - x.length))
-    .map(binaryStringToDecimal(_).toChar)
-    .mkString
+    .map(binaryToDecimal(_).toByte).toArray
   }
 
-  def deleteExtraZero(s: String): String = {
+  def deleteExtraZero(s: Array[Int]): Array[Int] = {
     val BIT_LENGTH = 8
     val len = s.length
     s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
