@@ -38,6 +38,7 @@ class testBase64 extends FunSuite{
     assert(Base64.encode("hogepiyofoobar".getBytes) == "aG9nZXBpeW9mb29iYXI=")
     assert(Base64.encode("ABCDEFG".getBytes.toList) == "QUJDREVGRw==")
     assert(Base64.encode("hogepiyofoobar".getBytes.toList) == "aG9nZXBpeW9mb29iYXI=")
+    assert(Base64.encode("homuho".getBytes.toList) == "aG9tdWhv")
   }
 
   test("deleteEqual"){

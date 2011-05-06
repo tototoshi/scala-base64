@@ -13,7 +13,7 @@ object Base64 {
       .map(x => encodeChar(binaryStringToDecimal(x)))
       .mkString
     }
-    encoded + "=" * (4 - encoded.length % 4)
+    encoded + "=" * ((4 - encoded.length % 4) % 4)
   }
 
   def encodeChar(i: Int) :Char = encodeTable(i)
