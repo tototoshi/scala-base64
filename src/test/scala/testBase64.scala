@@ -11,8 +11,8 @@ class testBase64 extends FunSuite{
     assert(Base64.encodeChar(53) == '1')
   }
 
-  test("toBinaryArray") {
-    assert(Base64.toBinaryArray(8)("ABCDEFG" getBytes).toList.mkString == "01000001010000100100001101000100010001010100011001000111")
+  test("toBinarySeq") {
+    assert(Base64.toBinarySeq(8)("ABCDEFG" getBytes).toList.mkString == "01000001010000100100001101000100010001010100011001000111")
   }
 
   test("binaryToDecimal") {

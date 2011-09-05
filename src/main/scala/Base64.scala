@@ -3,70 +3,65 @@ package com.tototoshi.base64
 object Base64 {
   val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-  def encode(fromBytes: Array[Byte]) : String = {
-    val encoded = {
+  def encode(fromBytes: Seq[Byte]) : String = {
+    val encoded =
       group6Bits(fromBytes)
-      .map(x => encodeChar(binaryToDecimal(x.toArray)))
+      .map(x => encodeChar(binaryToDecimal(x)))
       .mkString
-    }
+
     encoded + "=" * ((4 - encoded.length % 4) % 4) grouped(76) mkString "\n"
   }
 
   def encodeChar(i: Int) :Char = encodeTable(i)
 
-  def binaryToDecimal(ba: Array[Int]): Int = {
-    val len = ba.length
+  def binaryToDecimal(from: Seq[Int]): Int = {
+    val len = from.length
     var sum = 0
     var i = 0
     while (i < len) {
-      sum += ba(len - i - 1) * math.pow(2, i).toInt
+      sum += from(len - i - 1) * math.pow(2, i).toInt
       i += 1
     }
     sum
   }
 
-  def group6Bits(fromBytes: Array[Byte]) :List[List[Int]] = {
+  def group6Bits(fromBytes: Seq[Byte]) :List[List[Int]] = {
     val BIT_LENGTH = 6
-    val src = toBinaryArray(8)(fromBytes)
+    val src = toBinarySeq(8)(fromBytes)
     trimList[Int](src.toList.grouped(BIT_LENGTH).toList, BIT_LENGTH, 0)
   }
 
-  def toBinaryArray(bitLength: Int)(from: Array[Byte]): Array[Int] = {
-    val ba = Array.fill(bitLength * from.length)(0)
+  def toBinarySeq(bitLength: Int)(from: Seq[Byte]): Seq[Int] = {
+    val result = scala.collection.mutable.Seq.fill(bitLength * from.length)(0)
     var i = 0
     while (i < bitLength * from.length) {
-      ba((i / bitLength) * bitLength + bitLength - (i % 8) - 1) = from(i / bitLength) >> (i % bitLength) & 1
+      result((i / bitLength) * bitLength + bitLength - (i % 8) - 1) = from(i / bitLength) >> (i % bitLength) & 1
       i += 1
     }
-    ba
+    result
   }
 
   def deleteEqual(src: String) :String = src.filter(_ != '=')
 
-  def getEncodeTableIndexList(s: String): List[Int]= {
-    deleteEqual(s)
-    .map(x => encodeTable.indexOf(x))
-    .toList
+  def getEncodeTableIndexList(s: String): Seq[Int]= {
+    deleteEqual(s).map(x => encodeTable.indexOf(x))
   }
 
-  def decode(src: String) :Array[Byte] = {
+  def decode(src: String) :Seq[Byte] = {
     val BIT_LENGTH = 8
 
-    val indexArray = {
+    val indexSeq =
       getEncodeTableIndexList(src.filterNot(_ == '\n'))
-      .map(x => toBinaryArray(6)(Array.fill(1)(x.toByte)))
-    }
-    val binaryArray: Array[Int] = deleteExtraZero(indexArray.flatMap(s => s).toArray)
+      .map(x => toBinarySeq(6)(Seq.fill(1)(x.toByte)))
 
-    binaryArray
+    deleteExtraZero(indexSeq.flatMap(s => s))
     .grouped(BIT_LENGTH)
-    .map(binaryToDecimal(_).toByte).toArray
+    .map(binaryToDecimal(_).toByte).toSeq
   }
 
-  def deleteExtraZero(s: Array[Int]): Array[Int] = {
+  def deleteExtraZero(s: Seq[Int]): Seq[Int] = {
     val BIT_LENGTH = 8
-    val len = s.length
-    s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
+    s.take((s.length / BIT_LENGTH)  * BIT_LENGTH)
   }
 
   def trim[A](xs: List[A], n: Int, c: A): List[A] = {
