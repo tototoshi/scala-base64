@@ -1,6 +1,6 @@
-package com.tototoshi.test.base64
+package com.github.tototoshi.test.base64
 
-import com.tototoshi.base64.Base64
+import com.github.tototoshi.base64.Base64
 import org.scalatest.FunSuite
 import org.apache.commons.io.FileUtils
 import java.io.File

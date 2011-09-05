@@ -1,4 +1,4 @@
-package com.tototoshi.base64
+package com.github.tototoshi.base64
 
 object Base64 {
   val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
