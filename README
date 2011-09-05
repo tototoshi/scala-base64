@@ -1,5 +1,7 @@
+scala> import com.github.tototoshi.base64.Base64
+import com.github.tototoshi.base64.Base64
 
-
-
+scala> Base64.encode("github".getBytes)
+res0: String = Z2l0aHVi
 
 
